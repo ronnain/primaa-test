@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@primaa/blog-api-contract": ["libs/blog-api-contract/src/index.ts"],
+      "@primaa/blog-types": ["libs/blog-types/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

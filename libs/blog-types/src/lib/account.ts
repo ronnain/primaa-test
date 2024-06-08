@@ -1,0 +1,1 @@
+export const SafeClientAccountSchema = AccountSchema.omit({ passWord: true });// todo continue here then contract
