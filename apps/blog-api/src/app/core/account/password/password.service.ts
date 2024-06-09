@@ -12,8 +12,4 @@ export class PasswordService {
         const hashedInput = this.hash(plainTextPassword);
         return hashedInput === hashedPassword;
     }
-
-    public generateRandomPassword() {
-        return crypto.randomBytes(8).toString('hex');
-    }
 }
