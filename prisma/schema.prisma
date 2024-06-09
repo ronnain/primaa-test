@@ -13,13 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Account {
   id    Int     @default(autoincrement()) @id
   email String  @unique
   password  String
+  role String /// enum Role ADMIN | USER
   articles Article[]
   comments Comment[]
 }
+
+// enum Role { // enum is not supported in SQLite
+//   USER
+//   ADMIN
+// }
 
 model Article {
   id    Int     @default(autoincrement()) @id
@@ -27,7 +33,7 @@ model Article {
   updatedAt  DateTime   @default(now())
   title String
   content String
-  user User @relation(fields: [userId], references: [id])
+  user Account @relation(fields: [userId], references: [id])
   userId Int
   comments Comment[]
 }
@@ -37,7 +43,7 @@ model Comment {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
   content String
-  user User @relation(fields: [userId], references: [id])
+  user Account @relation(fields: [userId], references: [id])
   userId Int
   article Article @relation(fields: [articleId], references: [id])
   articleId Int
