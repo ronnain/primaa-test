@@ -18,10 +18,8 @@ export default class LoginPageComponent {
       })
       .subscribe();
 
-    this.blogApi.auth
-      .login({
-        body: { email: 'test@gmail.com', password: 'password' },
-      })
-      .subscribe();
+    this.blogApi.auth.login({
+      body: { email: 'test@gmail.com', password: 'password' },
+    });
   }
 }
