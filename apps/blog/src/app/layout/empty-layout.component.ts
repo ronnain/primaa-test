@@ -2,11 +2,9 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
+  selector: 'app-empty-layout',
   standalone: true,
   imports: [RouterModule],
-  selector: 'app-root',
-  template: '<router-outlet/>',
+  template: ` <router-outlet /> `,
 })
-export class AppComponent {
-  title = 'blog';
-}
+export class EmptyLayoutComponent {}
