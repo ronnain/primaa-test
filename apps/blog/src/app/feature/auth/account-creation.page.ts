@@ -1,197 +1,189 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+
+import {
+  FormBuilder,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  CreateAccount,
+  CreateAccountSchema,
+  Role,
+  Roles,
+} from '@primaa/blog-types';
+import { ReplaySubject, map, shareReplay, switchMap } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { UserAuthStore } from '../../core/auth/user-auth.store';
+import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.error';
 
 @Component({
   selector: 'app-account-creation-page',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDividerModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+    MatInputModule,
+    FormsModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    RouterModule,
+  ],
   template: `
-    <section>
-      <div class="example-label">Basic</div>
-      <div class="example-button-row">
-        <button mat-button>Basic</button>
-        <button mat-button color="primary">Primary</button>
-        <button mat-button color="accent">Accent</button>
-        <button mat-button color="warn">Warn</button>
-        <button mat-button disabled>Disabled</button>
-        <a mat-button href="https://www.google.com/" target="_blank">Link</a>
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">Raised</div>
-      <div class="example-button-row">
-        <button mat-raised-button>Basic</button>
-        <button mat-raised-button color="primary">Primary</button>
-        <button mat-raised-button color="accent">Accent</button>
-        <button mat-raised-button color="warn">Warn</button>
-        <button mat-raised-button disabled>Disabled</button>
-        <a mat-raised-button href="https://www.google.com/" target="_blank"
-          >Link</a
-        >
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">Stroked</div>
-      <div class="example-button-row">
-        <button mat-stroked-button>Basic</button>
-        <button mat-stroked-button color="primary">Primary</button>
-        <button mat-stroked-button color="accent">Accent</button>
-        <button mat-stroked-button color="warn">Warn</button>
-        <button mat-stroked-button disabled>Disabled</button>
-        <a mat-stroked-button href="https://www.google.com/" target="_blank"
-          >Link</a
-        >
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">Flat</div>
-      <div class="example-button-row">
-        <button mat-flat-button>Basic</button>
-        <button mat-flat-button color="primary">Primary</button>
-        <button mat-flat-button color="accent">Accent</button>
-        <button mat-flat-button color="warn">Warn</button>
-        <button mat-flat-button disabled>Disabled</button>
-        <a mat-flat-button href="https://www.google.com/" target="_blank"
-          >Link</a
-        >
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">Icon</div>
-      <div class="example-button-row">
-        <div class="example-flex-container">
-          <button
-            mat-icon-button
-            aria-label="Example icon button with a vertical three dot icon"
-          >
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="primary"
-            aria-label="Example icon button with a home icon"
-          >
-            <mat-icon>home</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="accent"
-            aria-label="Example icon button with a menu icon"
-          >
-            <mat-icon>menu</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="warn"
-            aria-label="Example icon button with a heart icon"
-          >
-            <mat-icon>favorite</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            disabled
-            aria-label="Example icon button with a open in new tab icon"
-          >
-            <mat-icon>open_in_new</mat-icon>
-          </button>
+    <div class="container h-screen flex-col flex items-center justify-center">
+      <h1 class="text-3xl text-primary font-bold mb-8">Créer son compte</h1>
+
+      <form
+        [formGroup]="accountCreationForm"
+        (ngSubmit)="onCreateAccount(accountCreationForm)"
+      >
+        <div class="w-full flex items-center justify-center flex-col gap-2">
+          <mat-form-field class="w-full">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              placeholder="Ex. romain@primaa.fr"
+              formControlName="email"
+              autocomplete="email"
+              type="email"
+            />
+            <mat-icon matPrefix>alternate_email</mat-icon>
+            <!-- TODO check if account already exist -->
+          </mat-form-field>
+          <mat-form-field class="w-full">
+            <mat-label>Mot de passe</mat-label>
+            <input
+              matInput
+              placeholder="Ex. nuggets!25"
+              formControlName="password"
+              autocomplete="new-password"
+              #passWord
+              type="password"
+            />
+            <mat-hint>Minium 8 caractères</mat-hint>
+            <mat-icon matPrefix>lock</mat-icon>
+            <mat-icon
+              matSuffix
+              (click)="
+                passWord.type =
+                  passWord.type === 'password' ? 'text' : 'password'
+              "
+              >remove_red_eye</mat-icon
+            >
+          </mat-form-field>
+          <mat-form-field class="w-full">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+              @for (role of roles; track role) {
+              <mat-option [value]="role">{{ role }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">FAB</div>
-      <div class="example-button-row">
-        <div class="example-flex-container">
-          <div class="example-button-container">
-            <button
-              mat-fab
-              color="primary"
-              aria-label="Example icon button with a delete icon"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-fab
-              color="accent"
-              aria-label="Example icon button with a bookmark icon"
-            >
-              <mat-icon>bookmark</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-fab
-              color="warn"
-              aria-label="Example icon button with a home icon"
-            >
-              <mat-icon>home</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-fab
-              disabled
-              aria-label="Example icon button with a heart icon"
-            >
-              <mat-icon>favorite</mat-icon>
-            </button>
-          </div>
+        <div class="w-full flex justify-end">
+          <button mat-stroked-button color="accent">Valider</button>
         </div>
-      </div>
-    </section>
-    <mat-divider></mat-divider>
-    <section>
-      <div class="example-label">Mini FAB</div>
-      <div class="example-button-row">
-        <div class="example-flex-container">
-          <div class="example-button-container">
-            <button
-              mat-mini-fab
-              color="primary"
-              aria-label="Example icon button with a menu icon"
-            >
-              <mat-icon>menu</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-mini-fab
-              color="accent"
-              aria-label="Example icon button with a plus one icon"
-            >
-              <mat-icon>plus_one</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-mini-fab
-              color="warn"
-              aria-label="Example icon button with a filter list icon"
-            >
-              <mat-icon>filter_list</mat-icon>
-            </button>
-          </div>
-          <div class="example-button-container">
-            <button
-              mat-mini-fab
-              disabled
-              aria-label="Example icon button with a home icon"
-            >
-              <mat-icon>home</mat-icon>
-            </button>
-          </div>
+
+        @if($isCreationLoading()) {
+        <div class="text-primary">Création de votre compte en cours...</div>
+        } @if ($accountCreationError()) {
+        <div class="text-red-500">
+          {{ $accountCreationError() }}
         </div>
-      </div>
-    </section>
+        }
+      </form>
+    </div>
   `,
 })
-export default class AccountCreationPageComponent {}
+export default class AccountCreationPageComponent {
+  // to button go to login page
+  // todo add guard login page or go to the home page
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly userAuthStore = inject(UserAuthStore);
+
+  private readonly accountToCreate$ = new ReplaySubject<CreateAccount>();
+
+  private readonly accountCreation$ = this.accountToCreate$.pipe(
+    switchMap((accountToCreate) => {
+      return this.userAuthStore.createAccount(accountToCreate);
+    }),
+    shareReplay(1)
+  );
+
+  protected readonly $accountCreationError = toSignal(
+    this.accountCreation$.pipe(
+      map((accountCreation) => {
+        if (accountCreation.error instanceof EmailAlreadyExistsError) {
+          this.accountCreationForm.controls.email.setErrors({
+            notUnique: true,
+          });
+          return 'Un compte existe déjà pour cet email.';
+        }
+        if (accountCreation.hasError) {
+          return "Un erreur s'est produite lors de la création de votre compte.";
+        }
+        return null;
+      })
+    ),
+    {
+      initialValue: null,
+    }
+  );
+
+  protected readonly $isCreationLoading = toSignal(
+    this.accountCreation$.pipe(
+      map((accountCreation) => accountCreation?.isLoading)
+    ),
+    {
+      initialValue: false,
+    }
+  );
+
+  protected roles = Roles;
+
+  protected accountCreationForm = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    role: new FormControl<Role | null>(null, Validators.required),
+  });
+
+  constructor() {
+    effect(() => {
+      const userAuth = this.userAuthStore;
+      if (userAuth.isAuthenticated()) {
+        this.router.navigate(['login']); // todo change to home page
+      }
+    });
+  }
+
+  onCreateAccount(form: typeof this.accountCreationForm) {
+    if (form.invalid) {
+      return;
+    }
+    const accountCreation = CreateAccountSchema.safeParse(form.value);
+    if (!accountCreation.success) {
+      console.error(accountCreation.error.errors);
+      return;
+    }
+    this.accountToCreate$.next(accountCreation.data);
+  }
+}

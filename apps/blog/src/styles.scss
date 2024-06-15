@@ -65,18 +65,9 @@ html,
 body {
   height: 100%;
 }
-// :root {
-//   --font-sans: '';
-
-//   --error: #f44336;
-//   --primary: rgb(0, 53, 62);
-//   --secondary: rgb(225, 225, 127);
-//   --accent: #d2bcd9;
-//   --background: rgb(255, 254, 242);
-// }
 
 body {
-  background-color: var(--background);
+  background-color: rgb(255, 254, 242);
 }
 
 html,

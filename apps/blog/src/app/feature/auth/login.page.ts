@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { blogApi } from '../../core/api/blog-api';
+import { BlogApi } from '../../core/api/blog-api';
+import { from } from 'rxjs';
 
 @Component({
   selector: 'app-login-page',
@@ -9,16 +10,16 @@ import { blogApi } from '../../core/api/blog-api';
   template: `LoginPage`,
 })
 export default class LoginPageComponent {
-  private readonly blogApi = inject(blogApi);
+  private readonly BlogApi = inject(BlogApi);
 
   constructor() {
-    this.blogApi.auth
-      .login({
+    from(
+      this.BlogApi.auth.login({
         body: { email: 'test@gmail.com', password: 'password' },
       })
-      .subscribe();
+    ).subscribe();
 
-    this.blogApi.auth.login({
+    this.BlogApi.auth.login({
       body: { email: 'test@gmail.com', password: 'password' },
     });
   }

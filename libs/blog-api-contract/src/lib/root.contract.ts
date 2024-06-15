@@ -4,9 +4,13 @@ import { AuthContract } from './auth.contract';
 
 const c = initContract();
 
-export const RootContract = c.router({
-        account: AccountContract,
-        auth: AuthContract,
-    }, {
-        strictStatusCodes: true,
-});
+export const RootContract = c.router(
+  {
+    account: AccountContract,
+    auth: AuthContract,
+  },
+  {
+    strictStatusCodes: true,
+    pathPrefix: '/api',
+  }
+);
