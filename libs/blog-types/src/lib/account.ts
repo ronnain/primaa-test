@@ -28,3 +28,10 @@ export const CreateAccountSchema = AccountSchema.pick({
 });
 
 export type CreateAccount = z.infer<typeof CreateAccountSchema>;
+
+export const LoginAccountSchema = AccountSchema.pick({
+  email: true,
+  password: true,
+});
+
+export type LoginAccount = z.infer<typeof LoginAccountSchema>;

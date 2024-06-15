@@ -28,7 +28,7 @@ import {
 } from '@primaa/blog-types';
 import { ReplaySubject, map, shareReplay, switchMap } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
-import { UserAuthStore } from '../../core/auth/user-auth.store';
+import { AccountAuthStore } from '../../core/auth/account-auth.store';
 import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.error';
 
 @Component({
@@ -102,7 +102,7 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
           <button mat-stroked-button color="accent">Valider</button>
         </div>
 
-        @if($isCreationLoading()) {
+        @if($isLoading()) {
         <div class="text-primary">Création de votre compte en cours...</div>
         } @if ($accountCreationError()) {
         <div class="text-red-500">
@@ -114,17 +114,17 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
   `,
 })
 export default class AccountCreationPageComponent {
-  // to button go to login page
+  // todo button go to login page
   // todo add guard login page or go to the home page
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly userAuthStore = inject(UserAuthStore);
+  private readonly accountAuthStore = inject(AccountAuthStore);
 
   private readonly accountToCreate$ = new ReplaySubject<CreateAccount>();
 
   private readonly accountCreation$ = this.accountToCreate$.pipe(
     switchMap((accountToCreate) => {
-      return this.userAuthStore.createAccount(accountToCreate);
+      return this.accountAuthStore.createAccount(accountToCreate);
     }),
     shareReplay(1)
   );
@@ -149,14 +149,7 @@ export default class AccountCreationPageComponent {
     }
   );
 
-  protected readonly $isCreationLoading = toSignal(
-    this.accountCreation$.pipe(
-      map((accountCreation) => accountCreation?.isLoading)
-    ),
-    {
-      initialValue: false,
-    }
-  );
+  protected readonly $isLoading = this.accountAuthStore.isLoading;
 
   protected roles = Roles;
 
@@ -168,8 +161,8 @@ export default class AccountCreationPageComponent {
 
   constructor() {
     effect(() => {
-      const userAuth = this.userAuthStore;
-      if (userAuth.isAuthenticated()) {
+      const accountAuth = this.accountAuthStore;
+      if (accountAuth.isAuthenticated()) {
         this.router.navigate(['login']); // todo change to home page
       }
     });
