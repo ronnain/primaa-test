@@ -78,3 +78,8 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+:root {
+  --bottom-actions-bar-height: 52px;
+  --main-page-height: calc(100svh - var(--bottom-actions-bar-height));
+}

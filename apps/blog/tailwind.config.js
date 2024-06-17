@@ -14,6 +14,18 @@ module.exports = {
         secondary: 'rgb(225, 225, 127)',
         accent: 'rgb(210, 188, 217)',
       },
+      height: {
+        bottomActionsBar: 'var(--bottom-actions-bar-height)',
+        mainPageHeight: 'var(--main-page-height)',
+      },
+      maxHeight: {
+        bottomActionsBar: 'var(--bottom-actions-bar-height)',
+        mainPageHeight: 'var(--main-page-height)',
+      },
+      minHeight: {
+        bottomActionsBar: 'var(--bottom-actions-bar-height)',
+        mainPageHeight: 'var(--main-page-height)',
+      },
     },
   },
   plugins: [],

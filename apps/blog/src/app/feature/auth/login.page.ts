@@ -156,7 +156,7 @@ export default class LoginPageComponent {
     effect(() => {
       const userAuth = this.accountAuthStore;
       if (userAuth.isAuthenticated()) {
-        this.router.navigate(['home']); // todo change to home page
+        this.router.navigate(['articles']);
       }
     });
   }

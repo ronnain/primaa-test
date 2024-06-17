@@ -101,6 +101,9 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
         <div class="w-full flex justify-end">
           <button mat-stroked-button color="accent">Valider</button>
         </div>
+        <div class="">
+          <a [routerLink]="'/login'">Se connecter</a>
+        </div>
 
         @if($isLoading()) {
         <div class="text-primary">Création de votre compte en cours...</div>
@@ -114,8 +117,6 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
   `,
 })
 export default class AccountCreationPageComponent {
-  // todo button go to login page
-  // todo add guard login page or go to the home page
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly accountAuthStore = inject(AccountAuthStore);
@@ -163,7 +164,7 @@ export default class AccountCreationPageComponent {
     effect(() => {
       const accountAuth = this.accountAuthStore;
       if (accountAuth.isAuthenticated()) {
-        this.router.navigate(['login']); // todo change to home page
+        this.router.navigate(['articles']);
       }
     });
   }
