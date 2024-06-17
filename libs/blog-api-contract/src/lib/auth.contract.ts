@@ -1,5 +1,6 @@
 import {
   CreateAccountSchema,
+  JWTSchema,
   LoginAccountSchema,
   SafeAccountSchema,
 } from '@primaa/blog-types';
@@ -14,7 +15,11 @@ export const AuthContract = c.router(
       method: 'POST',
       path: ``,
       responses: {
-        201: SafeAccountSchema,
+        201: z
+          .object({
+            account: SafeAccountSchema,
+          })
+          .merge(JWTSchema),
         409: z.object({
           error: z.literal('Account already exists'),
           message: z.literal(
@@ -29,7 +34,11 @@ export const AuthContract = c.router(
       method: 'POST',
       path: `/login`,
       responses: {
-        200: SafeAccountSchema,
+        200: z
+          .object({
+            account: SafeAccountSchema,
+          })
+          .merge(JWTSchema),
         404: z.object({
           error: z.literal('Not found'),
           message: z.literal('Invalid email or password'),

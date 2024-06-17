@@ -35,3 +35,7 @@ export const LoginAccountSchema = AccountSchema.pick({
 });
 
 export type LoginAccount = z.infer<typeof LoginAccountSchema>;
+
+export const JWTSchema = z.object({
+  token: z.string(),
+});

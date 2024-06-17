@@ -8,4 +8,4 @@ pas mis en place le système de traduction (ngx-translate)
 
 // identifiant de test romain@test.fr romaintest
 
-//
+// todo voir pour le conflit de dépendence
