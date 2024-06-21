@@ -2,8 +2,10 @@ import {
   ArticleCreationSchema,
   ArticleEditSchema,
   ArticleSchema,
+  PaginationSchema,
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
+import { z } from 'zod';
 
 const c = initContract();
 
@@ -36,6 +38,18 @@ export const ArticlesContract = c.router(
         404: null,
       },
       summary: 'Get an article by id',
+    },
+    getArticles: {
+      method: 'GET',
+      path: '',
+      responses: {
+        200: z.object({
+          articles: ArticleSchema.array(),
+          hasMore: z.boolean(),
+        }),
+      },
+      summary: 'Get all articles',
+      query: PaginationSchema,
     },
   },
   {

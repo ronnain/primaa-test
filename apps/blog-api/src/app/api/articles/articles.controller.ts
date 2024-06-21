@@ -55,6 +55,13 @@ export class ArticlesController {
           };
         }
       },
+      getArticles: async ({ query }) => {
+        const articles = await this.articlesService.getArticles(query);
+        return {
+          status: 200,
+          body: articles,
+        };
+      },
     });
   }
 }

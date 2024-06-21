@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
-import { ArticleCreation } from '@primaa/blog-types';
+import { ArticleCreation, Pagination } from '@primaa/blog-types';
 
 @Injectable()
 export class ArticlesService {
@@ -33,5 +33,18 @@ export class ArticlesService {
         updatedAt: new Date(),
       },
     });
+  }
+
+  public async getArticles(query: Pagination) {
+    const articles = await this.prismaService.article.findMany({
+      take: query.take,
+      skip: query.skip,
+      orderBy: query.orderBy,
+    });
+    const hasMore = articles.length === query.take;
+    return {
+      articles,
+      hasMore,
+    };
   }
 }

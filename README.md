@@ -12,3 +12,5 @@ pas mis en place le système de traduction (ngx-translate)
 // todo voir pour le conflit de dépendence
 
 JWT pas mis de date d'expiration/pas géré
+
+page articles: géré un délais minimum de chargement pour éviter le blink
