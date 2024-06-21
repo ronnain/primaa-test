@@ -1,35 +1,5 @@
 import { Observable, catchError, of, startWith, switchMap, map } from 'rxjs';
-
-type SatedStreamResult<T> = {
-  isLoading: boolean;
-  isLoaded: boolean;
-  hasError: boolean;
-  error: unknown;
-  result: T | undefined;
-};
-
-export type StatedData<T> =
-  | {
-      readonly isLoading: false;
-      readonly isLoaded: true;
-      readonly hasError: false;
-      readonly error: undefined;
-      readonly result: T;
-    }
-  | {
-      readonly isLoading: true;
-      readonly isLoaded: false;
-      readonly hasError: false;
-      readonly error: undefined;
-      readonly result: T | undefined;
-    }
-  | {
-      readonly isLoading: false;
-      readonly isLoaded: false;
-      readonly hasError: true;
-      readonly error: any;
-      readonly result: undefined;
-    };
+import { StatedData } from '../utile/stated-data';
 
 export function statedStream<T>(
   toCall: Observable<T>,
@@ -46,7 +16,7 @@ export function statedStream<T>(
               hasError: false,
               error: undefined,
               result,
-            } as const satisfies SatedStreamResult<T>)
+            } as const satisfies StatedData<T>)
         ),
         startWith({
           isLoading: true,

@@ -1,11 +1,12 @@
-import { Controller } from "@nestjs/common";
-import { AuthService } from "./auth.service";
+import { Controller } from '@nestjs/common';
+import { AuthService } from './auth.service';
 import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
-import { RootContract } from "@primaa/blog-api-contract";
+import { RootContract } from '@primaa/blog-api-contract';
+import { PublicRoutes } from '../../core/account/auth/public-routes.guard';
 
 @Controller()
+@PublicRoutes()
 export class AuthController {
-
   constructor(private readonly authService: AuthService) {}
 
   @TsRestHandler(RootContract.auth)
@@ -17,13 +18,13 @@ export class AuthController {
           return {
             status: 201,
             body: safeAccount,
-          }
+          };
         } catch (error) {
           return {
             status: 409,
             body: {
-              error: "Account already exists",
-              message: "An account with this email address already exists.",
+              error: 'Account already exists',
+              message: 'An account with this email address already exists.',
             },
           };
         }
@@ -34,17 +35,17 @@ export class AuthController {
           return {
             status: 200,
             body: safeAccount,
-          }
+          };
         } catch (error) {
           return {
             status: 404,
             body: {
-              error: "Not found",
-              message: "Invalid email or password",
+              error: 'Not found',
+              message: 'Invalid email or password',
             },
           };
         }
-      }
+      },
     });
   }
 }

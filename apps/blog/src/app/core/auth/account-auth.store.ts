@@ -10,9 +10,8 @@ import { AuthService } from './auth-api.service';
 import { effect, inject } from '@angular/core';
 import { tap } from 'rxjs';
 import { statedStream } from '../rxjs/stated-stream';
-import { STATE_SIGNAL } from '@ngrx/signals/src/state-signal';
 
-export type StatedData<T> =
+export type StatedAuthData<T> =
   | {
       readonly isLoading: false;
       readonly isAuthenticated: false;
@@ -32,7 +31,7 @@ export type StatedData<T> =
       readonly token: undefined;
     };
 
-type AccountAuthState = StatedData<SafeAccount>;
+type AccountAuthState = StatedAuthData<SafeAccount>;
 
 const clientStorage = localStorage;
 const tokenKey = 'primaaToken';
@@ -112,6 +111,13 @@ export const AccountAuthStore = signalStore(
           },
         })
       ),
+    logout: () =>
+      patchState(store, {
+        isLoading: false,
+        isAuthenticated: false,
+        authenticatedUser: undefined,
+        token: undefined,
+      }),
   })),
   withHooks({
     onInit: (store) => {

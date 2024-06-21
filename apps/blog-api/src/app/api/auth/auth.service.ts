@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { CreateAccount, SafeAccountSchema } from '@primaa/blog-types';
-import { JwtService } from '@nestjs/jwt';
 import { PasswordService } from '../../core/account/password/password.service';
+import { AuthCoreService } from '../../core/account/auth/auth-core.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
     private passwordService: PasswordService,
-    private jwtService: JwtService
+    private authCoreService: AuthCoreService
   ) {}
 
   public async createAccount({ email, password, role }: CreateAccount) {
@@ -20,12 +20,10 @@ export class AuthService {
         role,
       },
     });
-    const token = this.jwtService.sign({
-      email: account.email,
-      role: account.role,
-    });
+    const safeAccount = SafeAccountSchema.parse(account);
+    const token = this.authCoreService.getJwtToken(account.id);
     return {
-      account: SafeAccountSchema.parse(account),
+      account: safeAccount,
       token,
     };
   }
@@ -46,14 +44,11 @@ export class AuthService {
     }
     console.log('sign');
     try {
-      console.log('process.env.JWT_AUTH_SECRET', process.env.JWT_AUTH_SECRET);
-      const token = this.jwtService.sign({
-        email: account.email,
-        role: account.role,
-      });
+      const safeAccount = SafeAccountSchema.parse(account);
+      const token = this.authCoreService.getJwtToken(account.id);
       console.log('token', token);
       return {
-        account: SafeAccountSchema.parse(account),
+        account: safeAccount,
         token,
       };
     } catch (error) {
