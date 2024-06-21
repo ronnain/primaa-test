@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
 import { Article, ArticleCreation, ArticleEdit } from '@primaa/blog-types';
-import { Observable, from, switchMap, tap } from 'rxjs';
+import { Observable, filter, from, switchMap, tap } from 'rxjs';
 import { BlogApi } from '../../core/api/blog-api';
 import { StatedData } from '../../core/utile/stated-data';
 
@@ -95,6 +95,15 @@ export class ArticleStore extends ComponentStore<ArticleEditionState> {
 
   public readonly loadArticle$ = this.effect((articleId$: Observable<number>) =>
     articleId$.pipe(
+      filter(
+        (articleId) =>
+          articleId !==
+          this.get((state) =>
+            state.result && !state.result.isArticleCreation
+              ? state.result.article.id
+              : undefined
+          )
+      ),
       tap(() => {
         this.setLoading();
       }),
@@ -178,6 +187,7 @@ export class ArticleStore extends ComponentStore<ArticleEditionState> {
               isArticleCreation: false,
               article: articleData.body,
             });
+            return;
           }
           if (articleData.status === 404) {
             this.setError('Article non trouvé');

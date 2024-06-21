@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AccountAuthStore } from '../../core/auth/account-auth.store';
 import { ArticleCreationSchema, ArticleEditSchema } from '@primaa/blog-types';
 import { ArticleStore } from './article.store.';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit-article-page',
@@ -67,21 +68,15 @@ import { ArticleStore } from './article.store.';
   `,
 })
 export default class EditArticlePageComponent {
-  public articleId = input<number | undefined>(undefined);
+  public articleId = input(undefined, {
+    transform: (value: string | undefined) =>
+      value ? parseInt(value, 10) : undefined,
+  });
 
   private readonly articleStore = inject(ArticleStore);
   private readonly accountAuthStore = inject(AccountAuthStore);
-
-  constructor() {
-    effect(() => {
-      const articleId = this.articleId();
-      if (typeof articleId === 'number') {
-        this.articleStore.loadArticle$(articleId);
-        return;
-      }
-      this.articleStore.setArticleCreation();
-    });
-  }
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   // todo add a loading state and error handling
   // todo disable submit the same
@@ -95,7 +90,10 @@ export default class EditArticlePageComponent {
                 vm.result?.article.title ?? '',
                 Validators.required
               ),
-              content: new FormControl('', Validators.required),
+              content: new FormControl(
+                vm.result?.article.content ?? '',
+                Validators.required
+              ),
             })
           : null;
 
@@ -106,6 +104,34 @@ export default class EditArticlePageComponent {
       })
     )
   );
+
+  constructor() {
+    effect(() => {
+      const articleId = this.articleId();
+
+      if (typeof articleId === 'number') {
+        this.articleStore.loadArticle$(articleId);
+        return;
+      }
+      this.articleStore.setArticleCreation();
+    });
+
+    effect(() => {
+      // redirect to the edit page of the article once it is created
+      const vm = this.$vm();
+      if (
+        vm &&
+        vm.isLoaded &&
+        !vm.result.isArticleCreation &&
+        vm.result.article.id &&
+        this.articleId() !== vm.result.article.id
+      ) {
+        this.router.navigate([vm.result.article.id], {
+          relativeTo: this.activatedRoute,
+        });
+      }
+    });
+  }
 
   onEdit() {
     const vm = this.$vm();
@@ -133,10 +159,12 @@ export default class EditArticlePageComponent {
         isArticleCreation: true,
         article: articleCreation.data,
       });
+      return;
     }
 
-    if (!currentArticleData.isArticleCreation) {
+    if (!currentArticleData.isArticleCreation && currentArticleData) {
       const articleEdit = ArticleEditSchema.safeParse({
+        id: currentArticleData.article.id,
         ...articleForm.value,
         authorAccountId: account.id,
       });
