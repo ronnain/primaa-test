@@ -11,11 +11,18 @@ import { RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { Pagination } from '@primaa/blog-types';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-articles-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatListModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatListModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   template: `
     <div class="max-h-mainPageHeight overflow-auto w-full">
       <div class="container">
@@ -45,11 +52,26 @@ import { Pagination } from '@primaa/blog-types';
         <div class="ml-4">
           <mat-list>
             @for (article of (query.data()?.articles ?? []); track article.id) {
-            <mat-list-item [routerLink]="['edit', article.id]"
-              ><span class=""
-                >{{ article.id }}: {{ article.title }}</span
-              ></mat-list-item
-            >
+            <mat-list-item>
+              <div class="flex w-full justify-between items-center">
+                <div>
+                  <span class="text-xs">{{ article.id }}:</span>
+                  {{ article.title }}
+                </div>
+                <div class="space-x-2">
+                  <button mat-icon-button icon [routerLink]="[article.id]">
+                    <mat-icon>remove_red_eye</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    icon
+                    [routerLink]="['edit', article.id]"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </mat-list-item>
             }
           </mat-list>
         </div>
