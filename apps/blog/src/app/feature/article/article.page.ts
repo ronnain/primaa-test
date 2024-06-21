@@ -30,7 +30,6 @@ import { BlogApi } from '../../core/api/blog-api';
             <div>{{ comment.account.email }}</div>
             <div>{{ comment.content }}</div>
           </div>
-
           }
         </div>
         }
