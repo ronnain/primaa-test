@@ -2,6 +2,7 @@ import {
   ArticleCreationSchema,
   ArticleEditSchema,
   ArticleSchema,
+  ArticleWithAuthorWithCommentsSchema,
   PaginationSchema,
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
@@ -34,7 +35,7 @@ export const ArticlesContract = c.router(
       method: 'GET',
       path: `/:articleId`,
       responses: {
-        200: ArticleSchema,
+        200: ArticleWithAuthorWithCommentsSchema,
         404: null,
       },
       summary: 'Get an article by id',

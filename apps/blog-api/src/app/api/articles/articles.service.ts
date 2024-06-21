@@ -20,6 +20,25 @@ export class ArticlesService {
       where: {
         id: articleId,
       },
+      include: {
+        comments: {
+          orderBy: {
+            id: 'desc',
+          },
+          include: {
+            account: {
+              select: {
+                email: true,
+              },
+            },
+          },
+        },
+        account: {
+          select: {
+            email: true,
+          },
+        },
+      },
     });
   }
 

@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { CommentWithAuthorSchema } from './comment';
+import { AccountSchema, SafeAccountSchema } from './account';
 
 export const ArticleCreationSchema = z.object({
   title: z.string(),
   content: z.string(),
-  // authorAccountId: z.number(),
 });
 export type ArticleCreation = z.infer<typeof ArticleCreationSchema>;
 
@@ -17,6 +18,11 @@ export const ArticleSchema = z.object({
 });
 
 export type Article = z.infer<typeof ArticleSchema>;
+
+export const ArticleWithAuthorWithCommentsSchema = ArticleSchema.extend({
+  account: SafeAccountSchema.pick({ email: true }),
+  comments: CommentWithAuthorSchema.array(),
+});
 
 export const ArticleEditSchema = ArticleSchema.omit({
   createdAt: true,
