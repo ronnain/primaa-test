@@ -10,14 +10,16 @@ import { BlogApi } from '../../core/api/blog-api';
   imports: [CommonModule],
   template: `
     <div class="max-h-mainPageHeight overflow-auto w-full space-y-4">
-      <div class="container">
+      <div class="container mx-auto">
         @if ($error()) {
         {{ $error() }}
         } @if ($articleData(); as articleData) {
-        <div>
+        <div class="p-4">
           <h1 class="text-2xl">{{ articleData.title }}</h1>
+          <div class="text-xs text-secondary-shade-50">
+            Par: {{ articleData.account.email }}
+          </div>
         </div>
-        <div class="mx-4">Auteur: {{ articleData.account.email }}</div>
 
         <div class="mx-4">
           <pre>{{ articleData.content }}</pre>
@@ -27,7 +29,9 @@ import { BlogApi } from '../../core/api/blog-api';
           Commentaires: @for (comment of articleData.comments; track comment.id)
           {
           <div class="mx-4">
-            <div>{{ comment.account.email }}</div>
+            <div class="text-xs text-secondary-shade-50">
+              De: {{ comment.account.email }}
+            </div>
             <div>{{ comment.content }}</div>
           </div>
           }
@@ -37,7 +41,7 @@ import { BlogApi } from '../../core/api/blog-api';
     </div>
   `,
 })
-export default class ArticleComponent {
+export default class ArticleDetailsComponent {
   private readonly blogApi = inject(BlogApi);
   protected articleId = input.required<string>();
 

@@ -51,7 +51,9 @@ import { AccountNotFoundError } from '../../core/auth/account-not-found.error';
     RouterModule,
   ],
   template: `
-    <div class="container h-screen flex-col flex items-center justify-center">
+    <div
+      class="mx-auto container h-screen flex-col flex items-center justify-center"
+    >
       <h1 class="text-3xl text-primary font-bold mb-8">Se connecter</h1>
 
       <form

@@ -19,8 +19,8 @@ export default <Routes>[
         loadComponent: () => import('./edit-article.page'),
       },
       {
-        path: ':articleId',
-        loadComponent: () => import('./article.page'),
+        path: 'details/:articleId',
+        loadComponent: () => import('./article-details.page'),
       },
     ],
   },

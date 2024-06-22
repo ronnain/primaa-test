@@ -1,73 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { map } from 'rxjs';
-import { MatButtonModule } from '@angular/material/button';
-import { AccountAuthStore } from '../../core/auth/account-auth.store';
-import { ArticleCreationSchema, ArticleEditSchema } from '@primaa/blog-types';
-import { ArticleStore } from './article.store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-edit-article-page',
+  selector: 'app-edit-comment',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-  ],
-  providers: [ArticleStore],
-  template: `
-    <div class="mx-auto container p-4">
-      <h1 class="text-2xl">Editer un article</h1>
-    </div>
-    @if ($vm(); as vm) { @if(vm.form) {
-    <form *ngIf="vm.form" [formGroup]="vm.form">
-      <div class="mx-auto container mx-auto px-4">
-        <div class="flex items-end gap-4 flex-col content-end">
-          <mat-form-field class="w-full">
-            <mat-label>Titre</mat-label>
-            <input
-              matInput
-              placeholder="Ex. 5 clés pour un article de qualité"
-              formControlName="title"
-            />
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Contenu</mat-label>
-            <textarea
-              matInput
-              placeholder="Ex. 1 - Rédiger du contenu de qualité..."
-              formControlName="content"
-            ></textarea>
-          </mat-form-field>
-
-          <button mat-flat-button color="primary" (click)="onEdit()">
-            Sauvegarder
-          </button>
-        </div>
-      </div>
-    </form>
-    } @if(vm.isLoading) { Chargement... } @if(vm.hasError) { Erreur:
-    {{ vm.error }}
-    } }
-  `,
+  imports: [CommonModule],
+  template: ``,
 })
-export default class EditArticlePageComponent {
+export class EditCommentComponent {
   public articleId = input(undefined, {
     transform: (value: string | undefined) =>
       value ? parseInt(value, 10) : undefined,

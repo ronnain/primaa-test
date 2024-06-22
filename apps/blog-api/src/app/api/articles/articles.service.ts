@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
-import { ArticleCreation, Pagination } from '@primaa/blog-types';
+import { ArticleCreation, ArticleEdit, Pagination } from '@primaa/blog-types';
 
 @Injectable()
 export class ArticlesService {
@@ -42,10 +42,11 @@ export class ArticlesService {
     });
   }
 
-  public saveArticle(articleId: number, data: ArticleCreation) {
+  public saveArticle(articleId: number, data: ArticleEdit) {
     return this.prismaService.article.update({
       where: {
         id: articleId,
+        authorAccountId: data.authorAccountId,
       },
       data: {
         ...data,

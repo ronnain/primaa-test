@@ -48,7 +48,7 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
     RouterModule,
   ],
   template: `
-    <div class="container h-screen flex-col flex items-center justify-center">
+    <div class="mx-auto container h-screen flex-col flex items-center justify-center">
       <h1 class="text-3xl text-primary font-bold mb-8">Créer son compte</h1>
 
       <form

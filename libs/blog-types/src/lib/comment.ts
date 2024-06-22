@@ -21,3 +21,9 @@ export const CommentCreationSchema = z.object({
   content: z.string(),
 });
 export type CommentCreation = z.infer<typeof CommentCreationSchema>;
+
+export const CommentEditSchema = CommentSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+});
+export type CommentEdit = z.infer<typeof CommentEditSchema>;

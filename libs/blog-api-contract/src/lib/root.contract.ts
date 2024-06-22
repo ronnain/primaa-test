@@ -4,6 +4,7 @@ import { AuthContract } from './auth.contract';
 import { ArticlesContract } from './articles.contract';
 import { ForbiddenSchema, UnauthorizedSchema } from '@primaa/blog-types';
 import { z } from 'zod';
+import { CommentsContract } from './comments.contract';
 
 const c = initContract();
 
@@ -12,6 +13,7 @@ export const RootContract = c.router(
     account: AccountContract,
     auth: AuthContract,
     articles: ArticlesContract,
+    comments: CommentsContract,
   },
   {
     strictStatusCodes: true,

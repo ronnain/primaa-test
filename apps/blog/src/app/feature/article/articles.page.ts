@@ -25,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
   ],
   template: `
     <div class="max-h-mainPageHeight overflow-auto w-full">
-      <div class="container">
+      <div class="container mx-auto">
         <div class="p-4">
           <h1 class="text-2xl">Articles</h1>
         </div>
@@ -59,7 +59,12 @@ import { MatIconModule } from '@angular/material/icon';
                   {{ article.title }}
                 </div>
                 <div class="space-x-2">
-                  <button mat-icon-button icon [routerLink]="[article.id]">
+                  <button
+                    mat-icon-button
+                    color="secondary"
+                    icon
+                    [routerLink]="['details', article.id]"
+                  >
                     <mat-icon>remove_red_eye</mat-icon>
                   </button>
                   <button
