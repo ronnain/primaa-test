@@ -36,7 +36,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     </div>
     @if ($vm(); as vm) { @if(vm.form) {
     <form *ngIf="vm.form" [formGroup]="vm.form">
-      <div class="mx-auto container mx-auto px-4">
+      <div class="mx-auto container px-4">
         <div class="flex items-end gap-4 flex-col content-end">
           <mat-form-field class="w-full">
             <mat-label>Titre</mat-label>

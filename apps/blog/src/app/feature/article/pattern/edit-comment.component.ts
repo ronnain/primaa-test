@@ -1,37 +1,83 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import {
+  Component,
+  Output,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import {
+  Comment,
+  CommentCreationSchema,
+  CommentEditSchema,
+} from '@primaa/blog-types';
+import { CommentStore } from './comment.store';
+import { AccountAuthStore } from '../../../core/auth/account-auth.store';
+import { outputFromObservable, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-edit-comment',
   standalone: true,
-  imports: [CommonModule],
-  template: ``,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
+  providers: [CommentStore],
+  template: ` @if ($vm(); as vm) { @if(vm.form) {
+    <form *ngIf="vm.form" [formGroup]="vm.form">
+      <div class="mx-auto container px-4">
+        <div class="flex items-end gap-4 flex-col content-end">
+          <mat-form-field class="w-full">
+            <mat-label>Contenu</mat-label>
+            <textarea
+              matInput
+              placeholder="Ex. 1 - Rédiger du contenu de qualité..."
+              formControlName="content"
+            ></textarea>
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" (click)="onEdit()">
+            Sauvegarder
+          </button>
+        </div>
+      </div>
+    </form>
+    } @if(vm.isLoading) { Chargement... } @if(vm.hasError) { Erreur:
+    {{ vm.error }}
+    } }`,
 })
 export class EditCommentComponent {
-  public articleId = input(undefined, {
-    transform: (value: string | undefined) =>
-      value ? parseInt(value, 10) : undefined,
-  });
+  public articleId = input.required<number>();
+  public commentToEdit = input<Comment>();
 
-  private readonly articleStore = inject(ArticleStore);
+  private readonly commentStore = inject(CommentStore);
   private readonly accountAuthStore = inject(AccountAuthStore);
-  private readonly router = inject(Router);
-  private readonly activatedRoute = inject(ActivatedRoute);
 
-  // todo add a loading state and error handling
-  // todo disable submit the same
+  public editedComment = outputFromObservable(this.commentStore.editedComment$);
 
   protected readonly $vm = toSignal(
-    this.articleStore.vm$.pipe(
+    this.commentStore.vm$.pipe(
       map((vm) => {
         const form = vm.result
           ? new FormGroup({
-              title: new FormControl(
-                vm.result?.article.title ?? '',
-                Validators.required
-              ),
               content: new FormControl(
-                vm.result?.article.content ?? '',
+                vm.result?.comment.content ?? '',
                 Validators.required
               ),
             })
@@ -48,28 +94,23 @@ export class EditCommentComponent {
   constructor() {
     effect(() => {
       const articleId = this.articleId();
+      const commentToEdit = this.commentToEdit();
 
-      if (typeof articleId === 'number') {
-        this.articleStore.loadArticle$(articleId);
+      if (!commentToEdit) {
+        this.commentStore.loadComment({
+          articleId,
+          isCommentCreation: true,
+          comment: {
+            content: '',
+          },
+        });
         return;
       }
-      this.articleStore.setArticleCreation();
-    });
-
-    effect(() => {
-      // redirect to the edit page of the article once it is created
-      const vm = this.$vm();
-      if (
-        vm &&
-        vm.isLoaded &&
-        !vm.result.isArticleCreation &&
-        vm.result.article.id &&
-        this.articleId() !== vm.result.article.id
-      ) {
-        this.router.navigate([vm.result.article.id], {
-          relativeTo: this.activatedRoute,
-        });
-      }
+      this.commentStore.loadComment({
+        articleId,
+        isCommentCreation: false,
+        comment: commentToEdit,
+      });
     });
   }
 
@@ -78,44 +119,47 @@ export class EditCommentComponent {
     if (!vm || !vm?.isLoaded) {
       return;
     }
-    const articleForm = vm?.isLoaded ? vm.form : null;
+    const commentForm = vm?.isLoaded ? vm.form : null;
     const account = this.accountAuthStore.authenticatedUser();
-    if (!articleForm || articleForm.invalid || !account) {
+    if (!commentForm || commentForm.invalid || !account) {
       return;
     }
-    const currentArticleData = vm.result;
+    const currentCommentData = vm.result;
 
-    if (currentArticleData.isArticleCreation) {
-      const articleCreation = ArticleCreationSchema.safeParse({
-        ...articleForm.value,
+    if (currentCommentData.isCommentCreation) {
+      const commentCreation = CommentCreationSchema.safeParse({
+        ...commentForm.value,
         authorAccountId: account.id,
       });
 
-      if (!articleCreation.success) {
-        console.error(articleCreation.error.errors);
+      if (!commentCreation.success) {
+        console.error(commentCreation.error.errors);
         return;
       }
-      this.articleStore.saveEditedArticle$({
-        isArticleCreation: true,
-        article: articleCreation.data,
+      this.commentStore.saveEditedComment$({
+        isCommentCreation: true,
+        comment: commentCreation.data,
+        articleId: currentCommentData.articleId,
       });
       return;
     }
 
-    if (!currentArticleData.isArticleCreation && currentArticleData) {
-      const articleEdit = ArticleEditSchema.safeParse({
-        id: currentArticleData.article.id,
-        ...articleForm.value,
+    if (!currentCommentData.isCommentCreation && currentCommentData) {
+      const commentEdit = CommentEditSchema.safeParse({
+        id: currentCommentData.comment.id,
+        ...commentForm.value,
         authorAccountId: account.id,
+        articleId: currentCommentData.comment.articleId,
       });
 
-      if (!articleEdit.success) {
-        console.error(articleEdit.error.errors);
+      if (!commentEdit.success) {
+        console.error(commentEdit.error.errors);
         return;
       }
-      this.articleStore.saveEditedArticle$({
-        isArticleCreation: false,
-        article: articleEdit.data,
+      this.commentStore.saveEditedComment$({
+        isCommentCreation: false,
+        comment: commentEdit.data,
+        articleId: currentCommentData.articleId,
       });
     }
   }

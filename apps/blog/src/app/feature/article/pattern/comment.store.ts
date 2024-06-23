@@ -1,18 +1,20 @@
 import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
-import { Observable, from, switchMap, tap } from 'rxjs';
+import { Observable, Subject, from, switchMap, tap } from 'rxjs';
 import { StatedData } from '../../../core/utile/stated-data';
 import { BlogApi } from '../../../core/api/blog-api';
-import { Comment, CommentCreation } from '@primaa/blog-types';
+import { CommentCreation, CommentEdit } from '@primaa/blog-types';
 
-type EditComment =
+export type EditComment =
   | {
       isCommentCreation: true;
       comment: CommentCreation;
+      articleId: number;
     }
   | {
       isCommentCreation: false;
-      comment: Comment;
+      comment: CommentEdit;
+      articleId: number;
     };
 
 export type CommentEditionState = StatedData<EditComment>;
@@ -23,20 +25,16 @@ export class CommentStore extends ComponentStore<CommentEditionState> {
 
   constructor() {
     super({
-      isLoaded: true,
-      isLoading: false,
+      isLoaded: false,
+      isLoading: true,
       hasError: false,
       error: undefined,
-      result: {
-        isCommentCreation: true,
-        comment: {
-          content: '',
-        },
-      },
+      result: undefined,
     });
   }
 
   public readonly vm$ = this.select((state) => state, { debounce: true });
+  public readonly editedComment$ = new Subject<EditComment>();
 
   private readonly setLoaded = this.updater(
     (state, commentData: NonNullable<CommentEditionState['result']>) => ({
@@ -79,17 +77,11 @@ export class CommentStore extends ComponentStore<CommentEditionState> {
   );
 
   public readonly setCommentCreation = this.updater(() => ({
-    isLoaded: true,
-    isLoading: false,
+    isLoaded: false,
+    isLoading: true,
     hasError: false,
     error: undefined,
-    result: {
-      isCommentCreation: true,
-      comment: {
-        title: '',
-        content: '',
-      },
-    },
+    result: undefined,
   }));
 
   public readonly loadComment = (commentData: EditComment) => {
@@ -114,29 +106,52 @@ export class CommentStore extends ComponentStore<CommentEditionState> {
               ...currentCommentData,
               ...commentData.comment,
             },
+            articleId: currentCommentData.articleId,
           });
         }),
         switchMap((commentData) => {
           if (commentData.isCommentCreation) {
             return from(
               this.blogApi.comments.createComment({
+                params: {
+                  articleId: `${commentData.articleId}`,
+                },
                 body: commentData.comment,
               })
             );
           }
           return from(
             this.blogApi.comments.saveComment({
-              params: { commentId: '' + commentData.comment.id },
+              params: {
+                commentId: '' + commentData.comment.id,
+                articleId: `${commentData.articleId}`,
+              },
               body: commentData.comment,
             })
           );
         }),
         tap((commentData) => {
-          if (commentData.status === 200 || commentData.status === 201) {
-            this.setLoaded({
+          if (commentData.status === 201) {
+            const commentEdited = {
               isCommentCreation: false,
               comment: commentData.body,
+              articleId: commentData.body.articleId,
+            };
+            this.setLoaded(commentEdited);
+            this.editedComment$.next({
+              ...commentEdited,
+              isCommentCreation: true,
             });
+            return;
+          }
+          if (commentData.status === 200) {
+            const commentEdited = {
+              isCommentCreation: false,
+              comment: commentData.body,
+              articleId: commentData.body.articleId,
+            };
+            this.setLoaded(commentEdited);
+            this.editedComment$.next(commentEdited);
             return;
           }
           if (commentData.status === 404) {
