@@ -17,6 +17,7 @@ import { AccountAuthStore } from '../../core/auth/account-auth.store';
 import { ArticleCreationSchema, ArticleEditSchema } from '@primaa/blog-types';
 import { ArticleStore } from './article.store';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-edit-article-page',
@@ -28,6 +29,8 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    CdkTextareaAutosize,
+    TextFieldModule,
   ],
   providers: [ArticleStore],
   template: `
@@ -53,6 +56,9 @@ import { ActivatedRoute, Router } from '@angular/router';
               matInput
               placeholder="Ex. 1 - Rédiger du contenu de qualité..."
               formControlName="content"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="10"
             ></textarea>
           </mat-form-field>
 

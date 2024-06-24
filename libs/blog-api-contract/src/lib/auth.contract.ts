@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 const c = initContract();
 
+// todo add a metadata for public routes
 export const AuthContract = c.router(
   {
     createAccount: {

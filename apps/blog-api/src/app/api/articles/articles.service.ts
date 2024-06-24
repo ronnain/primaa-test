@@ -29,6 +29,7 @@ export class ArticlesService {
             account: {
               select: {
                 email: true,
+                id: true,
               },
             },
           },

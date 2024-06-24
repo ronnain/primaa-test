@@ -1,13 +1,14 @@
 import {
   patchState,
   signalStore,
+  withComputed,
   withHooks,
   withMethods,
   withState,
 } from '@ngrx/signals';
 import { CreateAccount, LoginAccount, SafeAccount } from '@primaa/blog-types';
 import { AuthService } from './auth-api.service';
-import { effect, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import { tap } from 'rxjs';
 import { statedStream } from '../rxjs/stated-stream';
 
@@ -40,6 +41,11 @@ const accountKey = 'primaaAccount';
 export const AccountAuthStore = signalStore(
   { providedIn: 'root' },
   withState<AccountAuthState>(getInitialAccountAuthState()),
+  withComputed((state) => {
+    return {
+      isAdmin: computed(() => state.authenticatedUser()?.role === 'ADMIN'),
+    };
+  }),
   withMethods((store, authService = inject(AuthService)) => ({
     createAccount: (accountToCreate: CreateAccount) =>
       statedStream(authService.createAccount(accountToCreate)).pipe(
@@ -119,6 +125,7 @@ export const AccountAuthStore = signalStore(
         token: undefined,
       }),
   })),
+
   withHooks({
     onInit: (store) => {
       effect(() => {

@@ -1,6 +1,6 @@
 import { InjectionToken, inject } from '@angular/core';
 import { RootContract } from '@primaa/blog-api-contract';
-import { initNgClient } from '../utile/ts-rest-promise-to-observable';
+import { initNgClient } from '../utile/ts-rest-api-config';
 
 export const BlogApi = new InjectionToken(
   'Use this object to call the blog api backend.',

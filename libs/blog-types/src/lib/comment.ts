@@ -13,7 +13,7 @@ export const CommentSchema = z.object({
 export type Comment = z.infer<typeof CommentSchema>;
 
 export const CommentWithAuthorSchema = CommentSchema.extend({
-  account: SafeAccountSchema.pick({ email: true }),
+  account: SafeAccountSchema.pick({ email: true, id: true }),
 });
 export type CommentWithAuthor = z.infer<typeof CommentWithAuthorSchema>;
 
