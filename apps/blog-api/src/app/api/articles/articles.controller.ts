@@ -1,15 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseInterceptors } from '@nestjs/common';
 import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
 import { RootContract } from '@primaa/blog-api-contract';
 import { ArticlesService } from './articles.service';
 import { AuthAccount } from '../../core/account/auth/auth-account.decorator';
 import { SafeAccount } from '@primaa/blog-types';
+import { AfterHandlerGuard } from './test';
 
 @Controller()
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @TsRestHandler(RootContract.articles)
+  @UseInterceptors(AfterHandlerGuard)
   async handler(@AuthAccount() account: SafeAccount) {
     return tsRestHandler(RootContract.articles, {
       createArticle: async ({ body }) => {

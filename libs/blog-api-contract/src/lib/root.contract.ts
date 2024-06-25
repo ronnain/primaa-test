@@ -2,9 +2,27 @@ import { initContract } from '@ts-rest/core';
 import { AccountContract } from './account.contract';
 import { AuthContract } from './auth.contract';
 import { ArticlesContract } from './articles.contract';
-import { ForbiddenSchema, UnauthorizedSchema } from '@primaa/blog-types';
+import {
+  ForbiddenSchema,
+  RolesAccess,
+  UnauthorizedSchema,
+} from '@primaa/blog-types';
 import { z } from 'zod';
 import { CommentsContract } from './comments.contract';
+
+export type RouteAccessRestrictedTo = Readonly<{
+  routeRestrictedTo:
+    | {
+        roles: RolesAccess[];
+      }
+    | {
+        owner: true;
+      }
+    | {
+        roles: RolesAccess[];
+        owner: true;
+      };
+}>;
 
 const c = initContract();
 

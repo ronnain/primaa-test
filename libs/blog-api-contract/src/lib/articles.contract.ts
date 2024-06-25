@@ -7,6 +7,7 @@ import {
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
+import { provideMetadataRouteConfig } from './util';
 
 const c = initContract();
 
@@ -29,6 +30,13 @@ export const ArticlesContract = c.router(
         404: null,
       },
       body: ArticleEditSchema,
+      metadata: provideMetadataRouteConfig({
+        routeRestrictedTo: {
+          roles: ['ADMIN'],
+          owner: true,
+        },
+      } as const),
+      summary: 'Edit an article',
     },
     getArticle: {
       // todo handle getting article by role ?

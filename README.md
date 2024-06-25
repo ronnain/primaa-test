@@ -14,3 +14,5 @@ pas mis en place le système de traduction (ngx-translate)
 JWT pas mis de date d'expiration/pas géré
 
 page articles: géré un délais minimum de chargement pour éviter le blink
+Page edition d'article: mettre un guard
+Page article details: pagination comments

@@ -12,6 +12,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { Pagination } from '@primaa/blog-types';
 import { MatIconModule } from '@angular/material/icon';
+import { AccountAuthStore } from '../../core/auth/account-auth.store';
 
 @Component({
   selector: 'app-articles-page',
@@ -67,6 +68,9 @@ import { MatIconModule } from '@angular/material/icon';
                   >
                     <mat-icon>remove_red_eye</mat-icon>
                   </button>
+                  @if(accountAuthStore.isAdmin() ||
+                  accountAuthStore.authenticatedUser()?.id ===
+                  article.authorAccountId) {
                   <button
                     mat-icon-button
                     icon
@@ -74,6 +78,7 @@ import { MatIconModule } from '@angular/material/icon';
                   >
                     <mat-icon>edit</mat-icon>
                   </button>
+                  }
                 </div>
               </div>
             </mat-list-item>
@@ -86,6 +91,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export default class ArticlesPageComponent {
   private readonly blogApi = inject(BlogApi);
+  protected readonly accountAuthStore = inject(AccountAuthStore);
 
   protected page = signal(0);
 

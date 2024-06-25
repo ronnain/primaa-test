@@ -4,6 +4,8 @@ import { AuthJwtStrategy } from './auth-jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthJwtGuard } from './auth-jwt.guard';
 import { AuthCoreService } from './auth-core.service';
+import { AuthRoleValidatorService } from './auth-role-validator.service';
+import { AuthRolesRestrictedAccessGuard } from './auth-roles-restricted-access.guard';
 
 @Module({
   imports: [
@@ -18,6 +20,11 @@ import { AuthCoreService } from './auth-core.service';
     {
       provide: APP_GUARD,
       useClass: AuthJwtGuard,
+    },
+    AuthRoleValidatorService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthRolesRestrictedAccessGuard,
     },
   ],
   exports: [JwtModule, AuthCoreService],

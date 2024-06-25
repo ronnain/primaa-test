@@ -170,9 +170,9 @@ export default class EditArticlePageComponent {
 
     if (!currentArticleData.isArticleCreation && currentArticleData) {
       const articleEdit = ArticleEditSchema.safeParse({
-        id: currentArticleData.article.id,
         ...articleForm.value,
-        authorAccountId: account.id,
+        id: currentArticleData.article.id,
+        authorAccountId: currentArticleData.article.authorAccountId,
       });
 
       if (!articleEdit.success) {
