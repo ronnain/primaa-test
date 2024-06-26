@@ -8,6 +8,7 @@ import {
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
 import { provideMetadataRouteConfig } from './util';
+import { RoutePartPath } from './route-restrictions';
 
 const c = initContract();
 
@@ -62,6 +63,6 @@ export const ArticlesContract = c.router(
     },
   },
   {
-    pathPrefix: '/articles',
+    pathPrefix: `/${RoutePartPath.articles}`,
   }
 );

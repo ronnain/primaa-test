@@ -1,4 +1,5 @@
 import { RootContract } from '@primaa/blog-api-contract';
+import { SafeAccount } from '@primaa/blog-types';
 import { z } from 'zod';
 
 type RouteRestrictedToTheOwner = {
@@ -25,9 +26,9 @@ type FindRoutesThatAuthorizeTheResourceOwner<
             Merge<
               Acc,
               {
-                [key in Head]: (
-                  data: z.infer<T[Head]['body']>
-                ) => Promise<boolean>;
+                [key in Head]: (data: {
+                  body: z.infer<T[Head]['body']>;
+                }) => Promise<boolean>;
               }
             >
           >
@@ -45,11 +46,22 @@ type FindAllRoutesThatAuthorizeTheResourceOwner<
   >;
 };
 
+type RoutesValidators = FindAllRoutesThatAuthorizeTheResourceOwner<
+  typeof RootContract
+>;
+
 export type ValidateResourceOwnerForRoutes = {
-  validateOwner: () => FindAllRoutesThatAuthorizeTheResourceOwner<
-    typeof RootContract
-  >;
+  validateOwner: (account: SafeAccount) => RoutesValidators;
 };
+
+export type SubRouteValidators = ExcludeEmpty<
+  RoutesValidators[keyof RoutesValidators]
+>;
+
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
+  U[keyof U];
+
+type ExcludeEmpty<T> = T extends AtLeastOne<T> ? T : never;
 
 // https://github.com/ecyrbe/zodios/blob/main/src/utils.types.ts
 /**

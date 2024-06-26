@@ -4,6 +4,7 @@ import {
   CommentSchema,
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
+import { RoutePartPath } from './route-restrictions';
 
 const c = initContract();
 
@@ -29,6 +30,6 @@ export const CommentsContract = c.router(
     },
   },
   {
-    pathPrefix: '/comments',
+    pathPrefix: `/${RoutePartPath.comments}`,
   }
 );

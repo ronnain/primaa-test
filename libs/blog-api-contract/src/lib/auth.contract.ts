@@ -6,6 +6,7 @@ import {
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
+import { RoutePartPath } from './route-restrictions';
 
 const c = initContract();
 
@@ -50,7 +51,7 @@ export const AuthContract = c.router(
     },
   },
   {
-    pathPrefix: '/auth',
+    pathPrefix: `/${RoutePartPath.auth}`,
     strictStatusCodes: true,
   }
 );
