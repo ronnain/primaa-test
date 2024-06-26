@@ -5,6 +5,7 @@ import {
 } from '@primaa/blog-types';
 import { initContract } from '@ts-rest/core';
 import { RoutePartPath } from './route-restrictions';
+import { provideMetadataRouteConfig } from './util';
 
 const c = initContract();
 
@@ -26,6 +27,12 @@ export const CommentsContract = c.router(
         200: CommentSchema,
         404: null,
       },
+      metadata: provideMetadataRouteConfig({
+        routeRestrictedTo: {
+          roles: ['ADMIN'],
+          owner: true,
+        },
+      } as const),
       body: CommentEditSchema,
     },
   },

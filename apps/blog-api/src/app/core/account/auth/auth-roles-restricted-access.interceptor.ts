@@ -12,68 +12,28 @@ import {
   TsRestAppRouteMetadataKey,
   doesUrlMatchContractPath,
 } from '@ts-rest/nest';
-import { Observable, from, map, switchMap, take, tap } from 'rxjs';
+import { Observable, from, map, switchMap, take } from 'rxjs';
 import { SafeAccount } from '@primaa/blog-types';
 import {
   RouteAccessRestrictedTo,
   SubRoutePartPath,
 } from '@primaa/blog-api-contract';
-import { SubRouteValidators } from './ts-rest-auth-util';
+import {
+  SubRouteValidators,
+  SubRouteValidatorsKeys,
+} from './ts-rest-auth-util';
 
+/**
+ * Make sure to call this interceptor after @TsRestHandler
+ * It checks access to the route that implements metadata RouteAccessRestrictedTo.
+ * If not, it throws a ForbiddenException.
+ */
 @Injectable()
 export class AuthRolesRestrictedAccessInterceptor {
   constructor(
     private reflector: Reflector,
     private authRoleValidatorService: AuthRoleValidatorService
   ) {}
-
-  /**
-   * Method from TsRestHandlerInterceptor (from the lib)
-   * Returns the route of the current contract (ArticleContract...) that s defined at the controller level
-   */
-  private getAppRouteFromContext(ctx: ExecutionContext) {
-    const req: Request = ctx.switchToHttp().getRequest();
-    const appRoute = this.reflector.get<AppRoute | AppRouter | undefined>(
-      TsRestAppRouteMetadataKey,
-      ctx.getHandler()
-    );
-
-    if (!appRoute) {
-      throw new Error(
-        'Could not find app router or app route, ensure you are using the @TsRestHandler decorator on your method'
-      );
-    }
-
-    if (isAppRoute(appRoute)) {
-      throw new Error(
-        'Can not handle appRoute with this method, only AppRouter is supported'
-      );
-    }
-
-    const appRouter = appRoute;
-
-    const foundAppRoute = Object.entries(appRouter).find(([, value]) => {
-      if (isAppRoute(value)) {
-        return (
-          doesUrlMatchContractPath(
-            value.path,
-            //@ts-ignore
-            'path' in req ? req.path : req.routeOptions.url
-          ) && req.method === value.method
-        );
-      }
-
-      return null;
-    }) as [string, AppRoute] | undefined;
-
-    if (!foundAppRoute) {
-      throw new NotFoundException("Couldn't find route handler for this path");
-    }
-    return {
-      appRoute: foundAppRoute[1],
-      routeKey: foundAppRoute[0],
-    };
-  }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
@@ -128,11 +88,10 @@ export class AuthRolesRestrictedAccessInterceptor {
     let requestorCanAccessByHisRole = false;
     let isOwnerAccessGranted = false;
     if (mustCheckRole) {
-      // todo check role
-      requestorCanAccessByHisRole = false;
+      requestorCanAccessByHisRole = restrictedTo.roles.includes(account.role);
     }
 
-    if (requestorCanAccessByHisRole) {
+    if (mustCheckRole && requestorCanAccessByHisRole) {
       return true;
     }
 
@@ -144,7 +103,7 @@ export class AuthRolesRestrictedAccessInterceptor {
         body
       );
     }
-    return isOwnerAccessGranted;
+    return mustCheckOwner && isOwnerAccessGranted;
   }
 
   /**
@@ -162,19 +121,66 @@ export class AuthRolesRestrictedAccessInterceptor {
     body: any
   ) {
     const subContractPath = path.split('/')[2] as SubRoutePartPath; // eg: articles
-    console.log('subContractPath', subContractPath);
     const validatorHandler =
       this.authRoleValidatorService.validateOwner(account);
     const subValidatorHandler = validatorHandler[
       subContractPath
     ] as SubRouteValidators;
-    const routeMethodKey = routeKey as keyof SubRouteValidators;
+    const routeMethodKey = routeKey as SubRouteValidatorsKeys;
 
-    if (routeMethodKey in subValidatorHandler && subValidatorHandler) {
+    if (subValidatorHandler && routeMethodKey in subValidatorHandler) {
+      //@ts-ignore
       const isOwner = await subValidatorHandler[routeMethodKey]({ body });
-      console.log('isOwner', isOwner);
       return isOwner;
     }
     return true;
+  }
+
+  /**
+   * Method from TsRestHandlerInterceptor (from the lib)
+   * Returns the route of the current contract (ArticleContract...) that is defined at the controller level
+   */
+  private getAppRouteFromContext(ctx: ExecutionContext) {
+    const req: Request = ctx.switchToHttp().getRequest();
+    const appRoute = this.reflector.get<AppRoute | AppRouter | undefined>(
+      TsRestAppRouteMetadataKey,
+      ctx.getHandler()
+    );
+
+    if (!appRoute) {
+      throw new Error(
+        'Could not find app router or app route, ensure you are using the @TsRestHandler decorator on your method'
+      );
+    }
+
+    if (isAppRoute(appRoute)) {
+      throw new Error(
+        'Can not handle appRoute with this method, only AppRouter is supported'
+      );
+    }
+
+    const appRouter = appRoute;
+
+    const foundAppRoute = Object.entries(appRouter).find(([, value]) => {
+      if (isAppRoute(value)) {
+        return (
+          doesUrlMatchContractPath(
+            value.path,
+            //@ts-ignore
+            'path' in req ? req.path : req.routeOptions.url
+          ) && req.method === value.method
+        );
+      }
+
+      return null;
+    }) as [string, AppRoute] | undefined;
+
+    if (!foundAppRoute) {
+      throw new NotFoundException("Couldn't find route handler for this path");
+    }
+    return {
+      appRoute: foundAppRoute[1],
+      routeKey: foundAppRoute[0],
+    };
   }
 }

@@ -32,7 +32,21 @@ export class AuthRoleValidatorService
         },
       },
       auth: {},
-      comments: {},
+      comments: {
+        saveComment: async ({ body }) => {
+          try {
+            await this.prismaService.comment.findUniqueOrThrow({
+              where: {
+                id: body.id,
+                authorAccountId: requestor.id,
+              },
+            });
+            return true;
+          } catch (error) {
+            return false;
+          }
+        },
+      },
     };
   }
 }

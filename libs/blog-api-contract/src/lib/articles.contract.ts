@@ -40,7 +40,6 @@ export const ArticlesContract = c.router(
       summary: 'Edit an article',
     },
     getArticle: {
-      // todo handle getting article by role ?
       method: 'GET',
       path: `/:articleId`,
       responses: {

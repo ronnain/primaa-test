@@ -58,6 +58,10 @@ export type SubRouteValidators = ExcludeEmpty<
   RoutesValidators[keyof RoutesValidators]
 >;
 
+export type SubRouteValidatorsKeys = DistributiveKeyof<SubRouteValidators>;
+
+type DistributiveKeyof<T> = T extends T ? keyof T : never;
+
 type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
   U[keyof U];
 
