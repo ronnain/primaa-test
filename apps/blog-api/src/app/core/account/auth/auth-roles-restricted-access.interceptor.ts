@@ -129,7 +129,6 @@ export class AuthRolesRestrictedAccessInterceptor {
     const routeMethodKey = routeKey as SubRouteValidatorsKeys;
 
     if (subValidatorHandler && routeMethodKey in subValidatorHandler) {
-      //@ts-ignore
       const isOwner = await subValidatorHandler[routeMethodKey]({ body });
       return isOwner;
     }

@@ -17,7 +17,7 @@ type FindRoutesThatAuthorizeTheResourceOwner<
   Acc extends Record<string, unknown> = {}
 > = TEndPointsKeys extends readonly [infer Head, ...infer Tail] //Get the first element of the tuple
   ? Head extends keyof T //Check if the first element is a key of the contract, is mainly used to satisfies TS
-    ? T[Head] extends any // Satisfies TS, ensure to TS that Head is a key of T
+    ? T[Head] extends T[Head] // Satisfies TS, ensure to TS that Head is a key of T
       ? T[Head]['metadata'] extends RouteRestrictedToTheOwner // check if the contract has a metadata key
         ? FindRoutesThatAuthorizeTheResourceOwner<
             // Add the route to the accumulator if the route has a metadata key
@@ -54,8 +54,12 @@ export type ValidateResourceOwnerForRoutes = {
   validateOwner: (account: SafeAccount) => RoutesValidators;
 };
 
-export type SubRouteValidators = ExcludeEmpty<
-  RoutesValidators[keyof RoutesValidators]
+/**
+ * Merge all the validators of all the subcontracts into a single type.
+ * (It should be an union type with validators of all the subcontracts, but it is hard to works with union types in this case, so I merge them into a single type.)
+ */
+export type SubRouteValidators = UnionToIntersection<
+  ExcludeEmpty<RoutesValidators[keyof RoutesValidators]>
 >;
 
 export type SubRouteValidatorsKeys = DistributiveKeyof<SubRouteValidators>;
