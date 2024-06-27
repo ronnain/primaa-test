@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  backend-app:
+    container_name: backend-app
+    restart: always
+    ports:
+      - '8080:3000'
+    build:
+      context: .
+      dockerfile: ./apps/blog-api/Dockerfile
+
+  frontend-app:
+    container_name: frontend-app
+    restart: always
+    ports:
+      - '8090:80'
+    depends_on:
+      - backend-app
+    build:
+      context: .
+      dockerfile: ./apps/blog/Dockerfile"
