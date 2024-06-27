@@ -1,9 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
-import { Observable, Subject, from, switchMap, tap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  from,
+  map,
+  mergeMap,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { StatedData } from '../../../core/utile/stated-data';
 import { BlogApi } from '../../../core/api/blog-api';
-import { CommentCreation, CommentEdit } from '@primaa/blog-types';
+import { CommentCreation, CommentEdit, Comment } from '@primaa/blog-types';
 
 export type EditComment =
   | {
@@ -35,6 +44,7 @@ export class CommentStore extends ComponentStore<CommentEditionState> {
 
   public readonly vm$ = this.select((state) => state, { debounce: true });
   public readonly editedComment$ = new Subject<EditComment>();
+  public readonly removedComment$ = new Subject<Comment>();
 
   private readonly setLoaded = this.updater(
     (state, commentData: NonNullable<CommentEditionState['result']>) => ({
@@ -159,6 +169,36 @@ export class CommentStore extends ComponentStore<CommentEditionState> {
             return;
           }
           this.setError("Erreur lors de la sauvegarde de l'comment");
+        })
+      )
+  );
+
+  public readonly removeComment$ = this.effect(
+    (commentId$: Observable<number>) =>
+      commentId$.pipe(
+        tap(() => this.setLoading()),
+        mergeMap((commentId) => {
+          return from(
+            this.blogApi.comments.removeComment({
+              params: {
+                commentId: '' + commentId,
+              },
+            })
+          );
+        }),
+        take(1),
+        map((commentData) => {
+          if (commentData.status === 204) {
+            this.setCommentCreation();
+            this.removedComment$.next(commentData.body);
+            return true;
+          }
+          if (commentData.status === 404) {
+            this.setError('Commentaire non trouvé');
+            return false;
+          }
+          this.setError("Erreur lors de la suppression de l'article");
+          return false;
         })
       )
   );

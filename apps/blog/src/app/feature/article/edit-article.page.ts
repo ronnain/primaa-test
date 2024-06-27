@@ -62,9 +62,14 @@ import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
             ></textarea>
           </mat-form-field>
 
-          <button mat-flat-button color="primary" (click)="onEdit()">
-            Sauvegarder
-          </button>
+          <div class="flex gap-2">
+            <button mat-button color="primary" (click)="onRemove()">
+              Supprimer
+            </button>
+            <button mat-flat-button color="primary" (click)="onEdit()">
+              Sauvegarder
+            </button>
+          </div>
         </div>
       </div>
     </form>
@@ -184,5 +189,17 @@ export default class EditArticlePageComponent {
         article: articleEdit.data,
       });
     }
+  }
+
+  onRemove() {
+    const articleId = this.articleId();
+    if (!articleId) {
+      return;
+    }
+    this.articleStore.removeArticle$(articleId).subscribe((data) => {
+      if (data) {
+        this.router.navigate(['/']);
+      }
+    });
   }
 }

@@ -42,7 +42,9 @@ export class AuthRolesRestrictedAccessInterceptor {
         const routeFound = this.getAppRouteFromContext(context);
         const user: SafeAccount = request.user.safeAccount;
 
-        return from(this.isAuthorized(user, routeFound, request.body)).pipe(
+        return from(
+          this.isAuthorized(user, routeFound, request.body, request.params)
+        ).pipe(
           take(1),
           map((isAuthorized) => ({ isAuthorized, response }))
         );
@@ -67,7 +69,8 @@ export class AuthRolesRestrictedAccessInterceptor {
       appRoute: AppRoute;
       routeKey: string;
     },
-    body: any
+    body: any,
+    params: any
   ): Promise<boolean> {
     if (!route.appRoute.metadata) {
       return true;
@@ -96,12 +99,13 @@ export class AuthRolesRestrictedAccessInterceptor {
     }
 
     if (mustCheckOwner) {
-      isOwnerAccessGranted = await this.checkOwnerAccess(
-        route.appRoute.path,
+      isOwnerAccessGranted = await this.checkOwnerAccess({
+        path: route.appRoute.path,
         account,
-        route.routeKey,
-        body
-      );
+        routeKey: route.routeKey,
+        body,
+        params,
+      });
     }
     return mustCheckOwner && isOwnerAccessGranted;
   }
@@ -114,12 +118,19 @@ export class AuthRolesRestrictedAccessInterceptor {
    * @param body
    * @returns
    */
-  async checkOwnerAccess(
-    path: string,
-    account: SafeAccount,
-    routeKey: string,
-    body: any
-  ) {
+  async checkOwnerAccess({
+    path,
+    account,
+    routeKey,
+    body,
+    params,
+  }: {
+    path: string;
+    account: SafeAccount;
+    routeKey: string;
+    body: any;
+    params: any;
+  }) {
     const subContractPath = path.split('/')[2] as SubRoutePartPath; // eg: articles
     const validatorHandler =
       this.authRoleValidatorService.validateOwner(account);
@@ -129,7 +140,10 @@ export class AuthRolesRestrictedAccessInterceptor {
     const routeMethodKey = routeKey as SubRouteValidatorsKeys;
 
     if (subValidatorHandler && routeMethodKey in subValidatorHandler) {
-      const isOwner = await subValidatorHandler[routeMethodKey]({ body });
+      const isOwner = await subValidatorHandler[routeMethodKey]({
+        body,
+        params,
+      });
       return isOwner;
     }
     return true;

@@ -23,6 +23,7 @@ export function provideEditCommentDialogData(data: EditCommentDialogData) {
         [articleId]="data.articleId"
         [commentToEdit]="data.comment"
         (editedComment)="onEditedComment()"
+        (removedComment)="onRemoveComment()"
       />
     </div>
   `,
@@ -33,6 +34,10 @@ export class EditCommentDialogComponent {
     inject(MatDialogRef);
 
   protected onEditedComment() {
+    this.matDialogRef.close();
+  }
+
+  protected onRemoveComment() {
     this.matDialogRef.close();
   }
 }

@@ -2,7 +2,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, lastValueFrom, catchError, of, defer } from 'rxjs';
+import { lastValueFrom, catchError, of } from 'rxjs';
 import { AppRouter, initClient, InitClientArgs } from '@ts-rest/core';
 
 export function initNgClient<

@@ -5,10 +5,12 @@ import {
   BehaviorSubject,
   Subject,
   from,
+  pipe,
   repeat,
   shareReplay,
   switchMap,
   take,
+  takeUntil,
   tap,
 } from 'rxjs';
 import { BlogApi } from '../../core/api/blog-api';
@@ -162,7 +164,10 @@ export default class ArticleDetailsComponent {
         comment,
       }),
     });
-    editCommentDialog.afterClosed().subscribe(() => this.refreshPage$.next());
+
+    editCommentDialog.afterClosed().subscribe(() => {
+      this.refreshPage$.next();
+    });
   }
 
   protected isAdmin = this.accountAuthStore.isAdmin;

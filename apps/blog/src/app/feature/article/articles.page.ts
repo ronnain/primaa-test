@@ -117,7 +117,7 @@ export default class ArticlesPageComponent {
             },
           })
         ).pipe(
-          delay(2000), // fake delay
+          delay(1000), // fake delay
           map((data) => data.body)
         )
       ),

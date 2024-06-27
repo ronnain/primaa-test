@@ -33,4 +33,12 @@ export class CommentsService {
       },
     });
   }
+
+  public async removeComment(commentId: number) {
+    return this.prismaService.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+  }
 }

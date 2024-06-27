@@ -30,6 +30,19 @@ export class AuthRoleValidatorService
             return false;
           }
         },
+        removeArticle: async ({ params }) => {
+          try {
+            await this.prismaService.article.findUniqueOrThrow({
+              where: {
+                id: parseInt(params.articleId, 10),
+                authorAccountId: requestor.id,
+              },
+            });
+            return true;
+          } catch (error) {
+            return false;
+          }
+        },
       },
       auth: {},
       comments: {
@@ -38,6 +51,19 @@ export class AuthRoleValidatorService
             await this.prismaService.comment.findUniqueOrThrow({
               where: {
                 id: body.id,
+                authorAccountId: requestor.id,
+              },
+            });
+            return true;
+          } catch (error) {
+            return false;
+          }
+        },
+        removeComment: async ({ params }) => {
+          try {
+            await this.prismaService.comment.findUniqueOrThrow({
+              where: {
+                id: parseInt(params.commentId, 10),
                 authorAccountId: requestor.id,
               },
             });

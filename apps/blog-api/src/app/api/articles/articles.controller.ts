@@ -64,6 +64,22 @@ export class ArticlesController {
           body: articles,
         };
       },
+      removeArticle: async ({ params }) => {
+        try {
+          const article = await this.articlesService.removeArticle(
+            parseInt(params.articleId)
+          );
+          return {
+            status: 204,
+            body: article,
+          };
+        } catch (error) {
+          return {
+            status: 404,
+            body: null,
+          };
+        }
+      },
     });
   }
 }

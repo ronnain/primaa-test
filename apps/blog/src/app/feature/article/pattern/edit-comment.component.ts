@@ -52,9 +52,14 @@ import { MatButtonModule } from '@angular/material/button';
             ></textarea>
           </mat-form-field>
 
-          <button mat-flat-button color="primary" (click)="onEdit()">
-            Sauvegarder
-          </button>
+          <div class="flex gap-2">
+            <button mat-button color="primary" (click)="onRemove()">
+              Supprimer
+            </button>
+            <button mat-flat-button color="primary" (click)="onEdit()">
+              Sauvegarder
+            </button>
+          </div>
         </div>
       </div>
     </form>
@@ -70,6 +75,9 @@ export class EditCommentComponent {
   private readonly accountAuthStore = inject(AccountAuthStore);
 
   public editedComment = outputFromObservable(this.commentStore.editedComment$);
+  public removedComment = outputFromObservable(
+    this.commentStore.removedComment$
+  );
 
   protected readonly $vm = toSignal(
     this.commentStore.vm$.pipe(
@@ -162,5 +170,13 @@ export class EditCommentComponent {
         articleId: currentCommentData.articleId,
       });
     }
+  }
+
+  onRemove() {
+    const comment = this.commentToEdit();
+    if (!comment) {
+      return;
+    }
+    this.commentStore.removeComment$(comment.id);
   }
 }

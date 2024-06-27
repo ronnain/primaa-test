@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
 import { Article, ArticleCreation, ArticleEdit } from '@primaa/blog-types';
-import { Observable, filter, from, switchMap, tap } from 'rxjs';
+import { Observable, filter, from, map, switchMap, take, tap } from 'rxjs';
 import { BlogApi } from '../../core/api/blog-api';
 import { StatedData } from '../../core/utile/stated-data';
 
@@ -197,4 +197,29 @@ export class ArticleStore extends ComponentStore<ArticleEditionState> {
         })
       )
   );
+
+  public readonly removeArticle$ = (articleId: number) => {
+    this.setLoading();
+    return from(
+      this.blogApi.articles.removeArticle({
+        params: {
+          articleId: '' + articleId,
+        },
+      })
+    ).pipe(
+      take(1),
+      map((articleData) => {
+        if (articleData.status === 204) {
+          this.setArticleCreation();
+          return true;
+        }
+        if (articleData.status === 404) {
+          this.setError('Article non trouvé');
+          return false;
+        }
+        this.setError("Erreur lors de la sauvegarde de l'article");
+        return false;
+      })
+    );
+  };
 }

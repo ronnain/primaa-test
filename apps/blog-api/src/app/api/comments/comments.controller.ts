@@ -41,6 +41,24 @@ export class CommentsController {
           };
         }
       },
+      removeComment: async ({ params }) => {
+        try {
+          const comment = await this.commentsService.removeComment(
+            parseInt(params.commentId)
+          );
+          console.log('comment', comment);
+          return {
+            status: 204,
+            body: comment,
+          };
+        } catch (error) {
+          console.error('error', error);
+          return {
+            status: 404,
+            body: null,
+          };
+        }
+      },
     });
   }
 }

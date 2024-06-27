@@ -35,6 +35,21 @@ export const CommentsContract = c.router(
       } as const),
       body: CommentEditSchema,
     },
+    removeComment: {
+      method: 'PUT',
+      path: `/:commentId`,
+      responses: {
+        204: CommentSchema,
+        404: null,
+      },
+      metadata: provideMetadataRouteConfig({
+        routeRestrictedTo: {
+          roles: ['ADMIN'],
+          owner: true,
+        },
+      } as const),
+      body: null,
+    },
   },
   {
     pathPrefix: `/${RoutePartPath.comments}`,

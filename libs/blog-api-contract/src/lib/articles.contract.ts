@@ -60,6 +60,22 @@ export const ArticlesContract = c.router(
       summary: 'Get all articles',
       query: PaginationSchema,
     },
+    removeArticle: {
+      method: 'DELETE',
+      path: '/:articleId',
+      metadata: provideMetadataRouteConfig({
+        routeRestrictedTo: {
+          roles: ['ADMIN'],
+          owner: true,
+        },
+      } as const),
+      body: null,
+      responses: {
+        204: ArticleSchema,
+        404: null,
+      },
+      summary: 'Remove an article',
+    },
   },
   {
     pathPrefix: `/${RoutePartPath.articles}`,

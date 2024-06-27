@@ -16,3 +16,11 @@ JWT pas mis de date d'expiration/pas géré
 page articles: géré un délais minimum de chargement pour éviter le blink
 Page edition d'article: mettre un guard
 Page article details: pagination comments
+
+// Add docker to Angular/NestJs app
+https://medium.com/@abdullahzengin/how-to-dockerize-your-nx-monorepo-applications-a-step-by-step-guide-using-angular-and-nestjs-a079b1b9a181
+
+//proxy équivalent nginx
+https://stackoverflow.com/questions/49239792/angular-proxy-configuration-for-development-and-production
+
+package.json -> j'ai pas résolu les conflits d'import
