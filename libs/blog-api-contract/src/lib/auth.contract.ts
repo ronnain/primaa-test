@@ -10,7 +10,6 @@ import { RoutePartPath } from './route-restrictions';
 
 const c = initContract();
 
-// todo add a metadata for public routes
 export const AuthContract = c.router(
   {
     createAccount: {

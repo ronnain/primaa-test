@@ -89,9 +89,6 @@ export default class EditArticlePageComponent {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  // todo add a loading state and error handling
-  // todo disable submit the same
-
   protected readonly $vm = toSignal(
     this.articleStore.vm$.pipe(
       map((vm) => {

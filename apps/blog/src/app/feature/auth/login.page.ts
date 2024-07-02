@@ -71,7 +71,6 @@ import { AccountNotFoundError } from '../../core/auth/account-not-found.error';
               type="email"
             />
             <mat-icon matPrefix>alternate_email</mat-icon>
-            <!-- TODO check if account already exist -->
           </mat-form-field>
           <mat-form-field class="w-full">
             <mat-label>Mot de passe</mat-label>
@@ -113,8 +112,6 @@ import { AccountNotFoundError } from '../../core/auth/account-not-found.error';
   `,
 })
 export default class LoginPageComponent {
-  // todo button go to registration page
-  // todo add guard login page or go to the home page
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly accountAuthStore = inject(AccountAuthStore);

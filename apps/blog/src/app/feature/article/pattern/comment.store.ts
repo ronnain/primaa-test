@@ -10,7 +10,7 @@ import {
   take,
   tap,
 } from 'rxjs';
-import { StatedData } from '../../../core/utile/stated-data';
+import { StatedData } from '../../../core/util/stated-data';
 import { BlogApi } from '../../../core/api/blog-api';
 import { CommentCreation, CommentEdit, Comment } from '@primaa/blog-types';
 

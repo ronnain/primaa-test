@@ -66,7 +66,6 @@ import { EmailAlreadyExistsError } from '../../core/auth/email-already-exists.er
               type="email"
             />
             <mat-icon matPrefix>alternate_email</mat-icon>
-            <!-- TODO check if account already exist -->
           </mat-form-field>
           <mat-form-field class="w-full">
             <mat-label>Mot de passe</mat-label>

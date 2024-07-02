@@ -22,7 +22,7 @@ export class AuthService {
         if (data.status === 409) {
           throw new EmailAlreadyExistsError();
         }
-        throw new Error('Unknown error'); // TODO TEST
+        throw new Error('Unknown error');
       })
     );
   }
@@ -40,7 +40,7 @@ export class AuthService {
         if (data.status === 404) {
           throw new AccountNotFoundError();
         }
-        throw new Error('Unknown error'); // TODO TEST
+        throw new Error('Unknown error');
       })
     );
   }

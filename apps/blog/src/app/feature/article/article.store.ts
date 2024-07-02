@@ -3,7 +3,7 @@ import { ComponentStore } from '@ngrx/component-store';
 import { Article, ArticleCreation, ArticleEdit } from '@primaa/blog-types';
 import { Observable, filter, from, map, switchMap, take, tap } from 'rxjs';
 import { BlogApi } from '../../core/api/blog-api';
-import { StatedData } from '../../core/utile/stated-data';
+import { StatedData } from '../../core/util/stated-data';
 
 type ArticleEditState =
   | {

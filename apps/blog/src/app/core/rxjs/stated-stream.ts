@@ -1,5 +1,5 @@
 import { Observable, catchError, of, startWith, switchMap, map } from 'rxjs';
-import { StatedData } from '../utile/stated-data';
+import { StatedData } from '../util/stated-data';
 
 export function statedStream<T>(
   toCall: Observable<T>,
