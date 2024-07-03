@@ -36,6 +36,10 @@ Sinon:
 
 - Je n'ai pas mis en place le SSR, bien que c'est utile si on veut référencer les articles.
 
-- Je me suis amusé à essayer quelques outils Ngrx/component pour ma culture Angular.
+- Je me suis amusé à essayer quelques outils Ngrx/component & TanStackQuery pour ma culture Angular.
 
 - J'ai pris du temps pour améliorer le système d'autorisation par role (RBAC), pour qu'il soit mieux typé et que je puisse l'utiliser sur mon projet perso.
+
+# Temps passé
+
+~12h30
